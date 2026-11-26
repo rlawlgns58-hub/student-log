@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>학생 기록</title>
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+  html,body{margin:0;height:100%;background:#f5f6f8;overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
+  #msg{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;color:#6b7480;font-size:14px;text-align:center;padding:24px;line-height:1.6}
+  #msg img{width:72px;height:72px;border-radius:18px}
+  #msg a{color:#2f6fde}
+  iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:transparent}
+</style>
+</head>
+<body>
+<div id="msg">
+  <img src="icons/icon-192.png" alt="">
+  <div id="msgText">불러오는 중…</div>
+</div>
+<script>
+  // ▼▼▼ 여기에 Apps Script 웹앱 주소(/exec 로 끝나는 주소)를 붙여넣으세요 ▼▼▼
+  const APP_URL = 'https://script.google.com/a/macros/jongchon.hs.kr/s/AKfycbwj7gVDNEmwI6PAn66MSP8S9duFgmetDc541oSJTzd8pUuCk2Z0IeGRp57A_a-9WZhx/exec';
+  // ▲▲▲
+
+  const ok = /^https:\/\/script\.google\.com\/macros\/s\/[\w-]{20,}\/exec/.test(APP_URL);
+  const text = document.getElementById('msgText');
+  if (!ok) {
+    text.innerHTML = 'index.html 파일의 <b>APP_URL</b>에<br>웹앱 주소(/exec로 끝나는 주소)를 넣어 주세요.';
+  } else {
+    const f = document.createElement('iframe');
+    f.src = APP_URL;
+    f.allow = 'clipboard-write';
+    f.title = '학생 기록 도우미';
+    document.body.appendChild(f);
+    // 오래 걸리면(로그인 문제 등) 브라우저에서 직접 여는 링크를 보여 줌 — 정상 로딩되면 iframe에 가려져 안 보임
+    setTimeout(() => {
+      text.innerHTML = '화면이 안 뜨면 구글 로그인 상태를 확인하거나<br><a href="' + APP_URL + '" target="_blank" rel="noopener">브라우저에서 직접 열기</a>';
+    }, 6000);
+  }
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>

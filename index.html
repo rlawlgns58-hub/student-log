@@ -20,27 +20,35 @@
 </head>
 <body>
 <div id="msg">
-  <img src="icons/icon-192.png" alt="">
+  <img src="icons/icon-192.png" alt="" onerror="this.style.display='none'">
   <div id="msgText">불러오는 중…</div>
 </div>
 <script>
   // ▼▼▼ 여기에 Apps Script 웹앱 주소(/exec 로 끝나는 주소)를 붙여넣으세요 ▼▼▼
-  const APP_URL = 'https://script.google.com/a/macros/jongchon.hs.kr/s/AKfycbwj7gVDNEmwI6PAn66MSP8S9duFgmetDc541oSJTzd8pUuCk2Z0IeGRp57A_a-9WZhx/exec';
+  const APP_URL = 'https://script.google.com/macros/s/여기에_배포ID/exec';
   // ▲▲▲
 
-  const ok = /^https:\/\/script\.google\.com\/macros\/s\/[\w-]{20,}\/exec/.test(APP_URL);
+  // 개인 계정: https://script.google.com/macros/s/…/exec
+  // 학교(워크스페이스) 계정: https://script.google.com/a/macros/학교도메인/s/…/exec
+  const url = String(APP_URL).trim();
+  const ok = /^https:\/\/script\.google\.com\/(a\/macros\/[^\/\s]+|macros)\/s\/[\w-]{20,}\/exec/.test(url);
   const text = document.getElementById('msgText');
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   if (!ok) {
-    text.innerHTML = 'index.html 파일의 <b>APP_URL</b>에<br>웹앱 주소(/exec로 끝나는 주소)를 넣어 주세요.';
+    let why = '웹앱 주소(/exec로 끝나는 주소)를 넣어 주세요.';
+    if (url.includes('여기에_배포ID')) why = '아직 예시 주소 그대로예요. 웹앱 주소로 바꿔 주세요.';
+    else if (/\/dev(\?|$)/.test(url)) why = '/dev 주소는 테스트용이에요. 배포 → 배포 관리에서 /exec 주소를 복사해 넣어 주세요.';
+    text.innerHTML = 'index.html 파일의 <b>APP_URL</b> 확인이 필요해요.<br>' + why +
+      '<br><br><small>현재 들어간 값: ' + esc(url.slice(0, 120)) + '</small>';
   } else {
     const f = document.createElement('iframe');
-    f.src = APP_URL;
+    f.src = url;
     f.allow = 'clipboard-write';
     f.title = '학생 기록 도우미';
     document.body.appendChild(f);
     // 오래 걸리면(로그인 문제 등) 브라우저에서 직접 여는 링크를 보여 줌 — 정상 로딩되면 iframe에 가려져 안 보임
     setTimeout(() => {
-      text.innerHTML = '화면이 안 뜨면 구글 로그인 상태를 확인하거나<br><a href="' + APP_URL + '" target="_blank" rel="noopener">브라우저에서 직접 열기</a>';
+      text.innerHTML = '화면이 안 뜨면 구글 로그인 상태를 확인하거나<br><a href="' + url + '" target="_blank" rel="noopener">브라우저에서 직접 열기</a>';
     }, 6000);
   }
 
